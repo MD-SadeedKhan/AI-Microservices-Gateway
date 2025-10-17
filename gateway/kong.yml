@@ -1,0 +1,19 @@
+_format_version: "2.1"
+services:
+  - name: retriever
+    url: http://retriever_agent:8000
+    routes:
+      - name: retrieve
+        paths: ["/retrieve"]
+
+  - name: processor
+    url: http://processor_agent:8000
+    routes:
+      - name: process
+        paths: ["/process"]
+
+  - name: policy
+    url: http://policy_service:8000
+    routes:
+      - name: policy
+        paths: ["/policy"]

@@ -1,0 +1,46 @@
+version: "3.9"
+services:
+  kong-database:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_DB: kong
+      POSTGRES_PASSWORD: kong
+    ports:
+      - "5432:5432"
+
+  kong:
+    image: kong:3.4
+    depends_on:
+      - kong-database
+      - retriever_agent
+      - processor_agent
+      - policy_service
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_PASSWORD: kong
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+    ports:
+      - "8000:8000"  # Proxy
+      - "8001:8001"  # Admin
+    command: "kong start"
+
+  retriever_agent:
+    build: ./retriever_agent
+    ports:
+      - "8002:8000"
+
+  processor_agent:
+    build: ./processor_agent
+    ports:
+      - "8003:8000"
+
+  policy_service:
+    build: ./policy_service
+    ports:
+      - "8004:8000"
